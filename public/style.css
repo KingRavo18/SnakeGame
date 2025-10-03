@@ -17,6 +17,10 @@ main{
         height: 500px;
         border: 2px solid black;
 
+        & #restart_btn{
+            display: none;
+        }
+
         & button {
             background-color: red;
             color: white;
@@ -34,6 +38,11 @@ main{
             &:hover{
               background-color: rgb(253, 124, 124);  
             }
+        }
+
+        .player_avatar{
+            background-color: red;
+            border: 1px solid white;
         }
     }
 }
