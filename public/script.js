@@ -3,29 +3,35 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 const player_avatar = document.createElement("div");
+const start_button = document.getElementById("start_btn");
 const game_tick = 100;
 let interval = null;
 let positionX = 0;
 let positionY = 0;
 
+
 function startGame(){
-    document.getElementById("start_btn").style.display = "none";
-    document.getElementById("restart_btn").style.display = "none";
+    start_button.style.display = "none";
+    gameSetup();
+    //interval = setInterval(() => avatarMove(game_screen_width, game_screen_height), game_tick);
+}
+
+function gameSetup() {
     const game_screen = document.getElementById("game_screen");
     const game_screen_width = game_screen.clientWidth; 
     const game_screen_height = game_screen.clientHeight; 
+    const total = Math.ceil(game_screen_height * game_screen_width / (42 ** 2));
+    console.log(total);
 
     player_avatar.classList.add("player_avatar");
     player_avatar.style.height = `${Math.ceil(game_screen_height / 12)}px`;
     player_avatar.style.width = `${Math.ceil(game_screen_width / 12)}px`;
-    game_screen.appendChild(player_avatar);
     player_avatar.style.marginLeft = `${positionX}px`;
     player_avatar.style.marginTop = `${positionY}px`;
-
-    interval = setInterval(() => avatar_move(game_screen_width, game_screen_height), game_tick);
+    game_screen.appendChild(player_avatar);
 }
 
-function avatar_move(game_screen_width, game_screen_height){
+function avatarMove(game_screen_width, game_screen_height){
     positionX += Math.ceil(game_screen_width / 12 / 2);
     if(positionX >= game_screen_width){
         gameOver();
@@ -35,9 +41,9 @@ function avatar_move(game_screen_width, game_screen_height){
 
 function gameOver(){
     clearInterval(interval);
-    const restartButton = document.getElementById("restart_btn");
-    restartButton.style.display = "block";
-    restartButton.onclick = restartGame;
+    start_button.textContent = "RESTART";
+    start_button.style.display = "block";
+    start_button.onclick = restartGame;
     
 }
 
