@@ -11,15 +11,10 @@ main{
     justify-content: center; 
 
     & #game_screen{
+        display: flex;
+        flex-wrap: wrap;
         padding: 0;
-        position: relative;
-        width: 500px;
-        height: 500px;
         border: 2px solid black;
-
-        & #restart_btn{
-            display: none;
-        }
 
         & button {
             background-color: red;
@@ -38,6 +33,12 @@ main{
             &:hover{
               background-color: rgb(253, 124, 124);  
             }
+        }
+
+        .grid_tile{
+            background-color: white;
+            margin: 0;
+            border: 1px solid lightgray;
         }
 
         .player_avatar{
