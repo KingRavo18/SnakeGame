@@ -38,10 +38,13 @@ main{
         .grid_tile{
             background-color: white;
             margin: 0;
+            padding: 0;
             border: 1px solid lightgray;
         }
 
         .player_avatar{
+            z-index: 2;
+            position: absolute;
             background-color: red;
             border: 1px solid white;
         }
