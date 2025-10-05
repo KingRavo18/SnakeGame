@@ -45,7 +45,7 @@ main{
         .player_avatar{
             z-index: 2;
             position: absolute;
-            background-color: red;
+            background-color: green;
             border: 1px solid white;
         }
     }

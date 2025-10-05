@@ -6,15 +6,17 @@ const player_avatar = document.createElement("div");
 const start_button = document.getElementById("start_btn");
 const tile_x_amount = 12; 
 const tile_y_amount = 12; 
-const game_tick = 100;
+const game_tick = 400;
 const grid = [];
-let positionX = 0;
-let positionY = 0;
+let direction;
+let positionX = 6;
+let positionY = 6;
 let interval = null;
 
 function startGame(){
     start_button.style.display = "none";
     gameSetup();
+    avatarDirection();
     interval = setInterval(avatarMove, game_tick);
 }
 
@@ -37,7 +39,6 @@ function gameSetup(){
         }  
         grid.push(x_array);
     }
-    console.log(grid[positionY][positionX]);
 
     player_avatar.classList.add("player_avatar");
     player_avatar.style.height = `${tile_size}px`;
@@ -45,24 +46,62 @@ function gameSetup(){
     grid[positionY][positionX].appendChild(player_avatar);
 }
 
+function avatarDirection(){
+    direction = "right";
+    document.addEventListener("keydown", event => {
+        switch(event.key){
+            case "ArrowRight":
+                direction = "right";
+                break;
+            case "ArrowDown":
+                direction = "down";
+                break;
+            case "ArrowLeft":
+                direction = "left";
+                break;
+            case "ArrowUp":
+                direction = "up";
+                break;
+        }
+    });
+}
+
 function avatarMove(){
     grid[positionY][positionX].removeChild(player_avatar);
-    positionX += 1;
+
+    switch(direction){
+        case "right":
+            positionX += 1;
+            break;
+        case "down":
+            positionY += 1;
+            break;
+        case "left":
+            positionX -= 1;
+            break;
+        case "up":
+            positionY -= 1;
+            break;
+    }
+    if(positionX >= tile_x_amount || positionY >= tile_y_amount || positionX < 0 || positionY < 0){
+        return gameOver();
+    }
+    
     grid[positionY][positionX].appendChild(player_avatar);
 }
 
-/*
 function gameOver(){
     clearInterval(interval);
     start_button.textContent = "RESTART";
     start_button.style.display = "block";
     start_button.onclick = restartGame;
-    
 }
 
 function restartGame(){
-    positionX = 0;
-    positionY = 0;
-    startGame();
+    positionX = 6;
+    positionY = 6;
+    avatarDirection();
+    grid[positionY][positionX].appendChild(player_avatar);
+    start_button.style.display = "none";
+    interval = setInterval(avatarMove, game_tick);
 }
-*/
