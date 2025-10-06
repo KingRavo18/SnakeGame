@@ -2,47 +2,54 @@ document.addEventListener("DOMContentLoaded", () => {
     start_button.onclick = () => startGame();
 });
 
-const player_avatar = document.createElement("div");
 const start_button = document.getElementById("start_btn");
+const player_avatar = document.createElement("div");
+const fruit_item = document.createElement("div");
+const tile_size = 40;
 const tile_x_amount = 12; 
 const tile_y_amount = 12; 
 const game_tick = 400;
 const grid = [];
 let direction;
-let positionX = 6;
-let positionY = 6;
+let positionX;
+let positionY;
+let fruitAmount = 0;
 let interval = null;
+let isBoardGenerated = false;
 
 function startGame(){
     start_button.style.display = "none";
     gameSetup();
     avatarDirection();
-    interval = setInterval(avatarMove, game_tick);
+    interval = setInterval(game, game_tick);
 }
 
 function gameSetup(){
-    const tile_size = 40; 
-    const game_screen = document.getElementById("game_screen");
-    game_screen.style.width = `${tile_size * tile_x_amount + 18}px`;
-    game_screen.style.height = `${tile_size * tile_y_amount + 18}px`;
+    if(!isBoardGenerated){
+         
+        const game_screen = document.getElementById("game_screen");
+        game_screen.style.width = `${tile_size * tile_x_amount + 18}px`;
+        game_screen.style.height = `${tile_size * tile_y_amount + 18}px`;
 
-    // Loop to create the game 2.5D grid node array
-    for(let i = 0; i < tile_y_amount; i++){
-        const x_array = [];
-        for(let j = 0; j < tile_x_amount; j++){
-            const grid_tile = document.createElement("div");
-            grid_tile.style.height = `${tile_size}px`;
-            grid_tile.style.width = `${tile_size}px`;
-            grid_tile.classList.add("grid_tile");
-            game_screen.appendChild(grid_tile);
-            x_array.push(grid_tile);
-        }  
-        grid.push(x_array);
+        // Loop to create the game 2.5D grid node array
+        for(let i = 0; i < tile_y_amount; i++){
+            const x_array = [];
+            for(let j = 0; j < tile_x_amount; j++){
+                const grid_tile = document.createElement("div");
+                grid_tile.style.height = `${tile_size}px`;
+                grid_tile.style.width = `${tile_size}px`;
+                grid_tile.classList.add("grid_tile");
+                game_screen.appendChild(grid_tile);
+                x_array.push(grid_tile);
+            }  
+            grid.push(x_array);
+        }
+        player_avatar.classList.add("player_avatar");
+        player_avatar.style.height = `${tile_size}px`;
+        player_avatar.style.width = `${tile_size}px`;
     }
-
-    player_avatar.classList.add("player_avatar");
-    player_avatar.style.height = `${tile_size}px`;
-    player_avatar.style.width = `${tile_size}px`;
+    positionX = 6;
+    positionY = 6;
     grid[positionY][positionX].appendChild(player_avatar);
 }
 
@@ -66,7 +73,8 @@ function avatarDirection(){
     });
 }
 
-function avatarMove(){
+function game(){
+    fruit();
     grid[positionY][positionX].removeChild(player_avatar);
 
     switch(direction){
@@ -90,18 +98,26 @@ function avatarMove(){
     grid[positionY][positionX].appendChild(player_avatar);
 }
 
+function fruit(){
+    if(fruitAmount < 1){
+        fruit_item.classList.add("fruit");
+        fruit_item.style.height = `${tile_size}px`;
+        fruit_item.style.width = `${tile_size}px`;
+        let fruit_Y_position;
+        let fruit_X_position;
+        do{
+            fruit_Y_position = Math.round(Math.random() * (tile_y_amount + 1));
+            fruit_X_position = Math.round(Math.random() * (tile_x_amount + 1));
+        }while(fruit_Y_position === positionY && fruit_X_position === positionX);
+        grid[fruit_Y_position][fruit_X_position].appendChild(fruit_item);
+        fruitAmount++;
+    }
+}
+
 function gameOver(){
     clearInterval(interval);
     start_button.textContent = "RESTART";
     start_button.style.display = "block";
-    start_button.onclick = restartGame;
+    start_button.onclick = startGame;
 }
 
-function restartGame(){
-    positionX = 6;
-    positionY = 6;
-    avatarDirection();
-    grid[positionY][positionX].appendChild(player_avatar);
-    start_button.style.display = "none";
-    interval = setInterval(avatarMove, game_tick);
-}

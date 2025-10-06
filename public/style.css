@@ -48,5 +48,13 @@ main{
             background-color: green;
             border: 1px solid white;
         }
+
+        .fruit{
+            z-index: 2;
+            position: absolute;
+            background-color: red;
+            border: 1px solid white;
+            border-radius: 50%;
+        }
     }
 }
