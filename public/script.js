@@ -12,7 +12,9 @@ const Player = {
 };
 const Fruit = {
     item: document.createElement("div"),
-}
+    positionX: undefined,
+    positionY: undefined,
+};
 const tile_x_amount = 12; 
 const tile_y_amount = 12; 
 const game_tick = 400;
@@ -107,13 +109,11 @@ function fruit(){
         Fruit.item.classList.add("fruit");
         Fruit.item.style.height = `${tile_size}px`;
         Fruit.item.style.width = `${tile_size}px`;
-        let fruit_Y_position;
-        let fruit_X_position;
         do{
-            fruit_Y_position = Math.round(Math.random() * (tile_y_amount + 1));
-            fruit_X_position = Math.round(Math.random() * (tile_x_amount + 1));
-        }while(fruit_Y_position === Player.positionY && fruit_X_position === Player.positionX);
-        grid[fruit_Y_position][fruit_X_position].appendChild(Fruit.item);
+            Fruit.positionY = Math.round(Math.random() * (tile_y_amount + 1));
+            Fruit.positionX = Math.round(Math.random() * (tile_x_amount + 1));
+        }while(Fruit.positionY === Player.positionY && Fruit.positionX === Player.positionX);
+        grid[Fruit.positionY][Fruit.positionX].appendChild(Fruit.item);
         fruitAmount++;
     }
 }
