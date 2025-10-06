@@ -3,7 +3,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 const start_button = document.getElementById("start_btn");
-const tile_size = 40;
 const Player = {
     avatar: document.createElement("div"),
     move_direction: undefined,
@@ -14,49 +13,52 @@ const Fruit = {
     item: document.createElement("div"),
     positionX: undefined,
     positionY: undefined,
+    amount_generated: 0,
 };
-const tile_x_amount = 12; 
-const tile_y_amount = 12; 
+const GameBoard = {
+    tile_size: 40,
+    tile_x_amount: 12,
+    tile_y_amount: 12,
+    grid: [],
+    isGenerated: false,
+};
 const game_tick = 400;
-const grid = [];
-let fruitAmount = 0;
 let interval = null;
-let isBoardGenerated = false;
 
 function startGame(){
     start_button.style.display = "none";
-    gameSetup();
+    setupGame();
     avatarDirection();
     interval = setInterval(game, game_tick);
 }
 
-function gameSetup(){
-    if(!isBoardGenerated){
-        isBoardGenerated = true;
+function setupGame(){
+    if(!GameBoard.isGenerated){
+        GameBoard.isGenerated = true;
         const game_screen = document.getElementById("game_screen");
-        game_screen.style.width = `${tile_size * tile_x_amount + 18}px`;
-        game_screen.style.height = `${tile_size * tile_y_amount + 18}px`;
+        game_screen.style.width = `${GameBoard.tile_size * GameBoard.tile_x_amount + 18}px`;
+        game_screen.style.height = `${GameBoard.tile_size * GameBoard.tile_y_amount + 18}px`;
 
-        // Loop to create the game 2.5D grid node array
-        for(let i = 0; i < tile_y_amount; i++){
+        // Loop to create the game 2.5D grid array
+        for(let i = 0; i < GameBoard.tile_y_amount; i++){
             const x_array = [];
-            for(let j = 0; j < tile_x_amount; j++){
+            for(let j = 0; j < GameBoard.tile_x_amount; j++){
                 const grid_tile = document.createElement("div");
-                grid_tile.style.height = `${tile_size}px`;
-                grid_tile.style.width = `${tile_size}px`;
+                grid_tile.style.height = `${GameBoard.tile_size}px`;
+                grid_tile.style.width = `${GameBoard.tile_size}px`;
                 grid_tile.classList.add("grid_tile");
                 game_screen.appendChild(grid_tile);
                 x_array.push(grid_tile);
             }  
-            grid.push(x_array);
+            GameBoard.grid.push(x_array);
         }
         Player.avatar.classList.add("player_avatar");
-        Player.avatar.style.height = `${tile_size}px`;
-        Player.avatar.style.width = `${tile_size}px`;
+        Player.avatar.style.height = `${GameBoard.tile_size}px`;
+        Player.avatar.style.width = `${GameBoard.tile_size}px`;
     }
     Player.positionX = 6;
     Player.positionY = 6;
-    grid[Player.positionY][Player.positionX].appendChild(Player.avatar);
+    GameBoard.grid[Player.positionY][Player.positionX].appendChild(Player.avatar);
 }
 
 function avatarDirection(){
@@ -81,7 +83,7 @@ function avatarDirection(){
 
 function game(){
     fruit();
-    grid[Player.positionY][Player.positionX].removeChild(Player.avatar);
+    GameBoard.grid[Player.positionY][Player.positionX].removeChild(Player.avatar);
 
     switch(Player.move_direction){
         case "right":
@@ -97,24 +99,23 @@ function game(){
             Player.positionY -= 1;
             break;
     }
-    if(Player.positionX >= tile_x_amount || Player.positionY >= tile_y_amount || Player.positionX < 0 || Player.positionY < 0){
+    if(Player.positionX >= GameBoard.tile_x_amount || Player.positionY >= GameBoard.tile_y_amount || Player.positionX < 0 || Player.positionY < 0){
         return gameOver();
     }
-    
-    grid[Player.positionY][Player.positionX].appendChild(Player.avatar);
+    GameBoard.grid[Player.positionY][Player.positionX].appendChild(Player.avatar);
 }
 
 function fruit(){
-    if(fruitAmount < 1){
+    if(Fruit.amount_generated < 1){
         Fruit.item.classList.add("fruit");
-        Fruit.item.style.height = `${tile_size}px`;
-        Fruit.item.style.width = `${tile_size}px`;
+        Fruit.item.style.height = `${GameBoard.tile_size}px`;
+        Fruit.item.style.width = `${GameBoard.tile_size}px`;
         do{
-            Fruit.positionY = Math.round(Math.random() * (tile_y_amount + 1));
-            Fruit.positionX = Math.round(Math.random() * (tile_x_amount + 1));
+            Fruit.positionY = Math.round(Math.random() * (GameBoard.tile_y_amount + 1));
+            Fruit.positionX = Math.round(Math.random() * (GameBoard.tile_x_amount + 1));
         }while(Fruit.positionY === Player.positionY && Fruit.positionX === Player.positionX);
-        grid[Fruit.positionY][Fruit.positionX].appendChild(Fruit.item);
-        fruitAmount++;
+        GameBoard.grid[Fruit.positionY][Fruit.positionX].appendChild(Fruit.item);
+        Fruit.amount_generated++;
     }
 }
 
