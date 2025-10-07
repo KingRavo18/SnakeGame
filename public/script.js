@@ -1,14 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
-    start_button.onclick = () => startGame();
+    document.getElementById("start_btn").onclick = () => startGame();
 });
 
-const start_button = document.getElementById("start_btn");
 const Player = {
     avatar: document.createElement("div"),
     move_direction: "right",
     positionX: 0,
-    positionY: 0,
-    death_sound: new Audio("Assets/Audio/explosion-312361.mp3"),    
+    positionY: 0, 
     fruit_picked_up: 0,
 };
 const Fruit = {
@@ -29,18 +27,27 @@ const GameBoard = {
 Fruit.item.classList.add("fruit");
 Fruit.item.style.height = `${GameBoard.tile_size}px`;
 Fruit.item.style.width = `${GameBoard.tile_size}px`;
-const game_tick = 400;
-let interval = null;
+
 
 function startGame(){
+    const game_tick = 400;
+    const start_button = document.getElementById("start_btn");
     start_button.style.display = "none";
     Player.fruit_picked_up = 0;
-    setupGame();
+
+    createAvatar();
+    setupBoard();
     avatarDirection();
-    interval = setInterval(game, game_tick);
+    let interval = setInterval(() => game(start_button, interval), game_tick);
 }
 
-function setupGame(){
+function createAvatar(){
+    Player.avatar.classList.add("player_avatar");
+    Player.avatar.style.height = `${GameBoard.tile_size}px`;
+    Player.avatar.style.width = `${GameBoard.tile_size}px`;
+}
+
+function setupBoard(){
     if(!GameBoard.isGenerated){
         GameBoard.isGenerated = true;
         const game_screen = document.getElementById("game_screen");
@@ -60,9 +67,6 @@ function setupGame(){
             }  
             GameBoard.grid.push(x_array);
         }
-        Player.avatar.classList.add("player_avatar");
-        Player.avatar.style.height = `${GameBoard.tile_size}px`;
-        Player.avatar.style.width = `${GameBoard.tile_size}px`;
     }
     Player.positionX = 6;
     Player.positionY = 6;
@@ -89,7 +93,7 @@ function avatarDirection(){
     });
 }
 
-function game(){
+function game(start_button, interval){
     document.getElementById("score").textContent = `SCORE: ${Player.fruit_picked_up * 100}`;
     fruit();
     GameBoard.grid[Player.positionY][Player.positionX].removeChild(Player.avatar);
@@ -107,7 +111,10 @@ function game(){
             Player.positionY -= 1;
             break;
     }
-    gameOver();
+    if(Player.positionX >= GameBoard.tile_x_amount || Player.positionY >= GameBoard.tile_y_amount || Player.positionX < 0 || Player.positionY < 0){
+        return gameOver(start_button, interval);
+    }
+    
     GameBoard.grid[Player.positionY][Player.positionX].appendChild(Player.avatar);
     if(Player.positionX === Fruit.positionX && Player.positionY === Fruit.positionY){
         Player.fruit_picked_up++;
@@ -115,26 +122,23 @@ function game(){
         Fruit.amount_generated--;
     }
 }
-
 // If there is no fruit, this function places the fruit on a random tile
 function fruit(){
     if(Fruit.amount_generated < 1){
         do{
-            Fruit.positionY = Math.floor(Math.random() * (GameBoard.tile_y_amount + 1));
-            Fruit.positionX = Math.floor(Math.random() * (GameBoard.tile_x_amount + 1));
+            Fruit.positionY = Math.floor(Math.random() * (GameBoard.tile_y_amount));
+            Fruit.positionX = Math.floor(Math.random() * (GameBoard.tile_x_amount));
         }while(Fruit.positionY === Player.positionY && Fruit.positionX === Player.positionX);
         GameBoard.grid[Fruit.positionY][Fruit.positionX].appendChild(Fruit.item);
         Fruit.amount_generated++;
     }
 }
 
-function gameOver(){
-    if(Player.positionX >= GameBoard.tile_x_amount || Player.positionY >= GameBoard.tile_y_amount || Player.positionX < 0 || Player.positionY < 0){
-        Player.death_sound.play();
-        clearInterval(interval);
-        start_button.textContent = "RESTART";
-        start_button.style.display = "block";
-        start_button.onclick = startGame;
-    }
+function gameOver(start_button, interval){
+    clearInterval(interval);
+    new Audio("Assets/Audio/explosion-312361.mp3").play();
+    start_button.textContent = "RESTART";
+    start_button.style.display = "block";
+    start_button.onclick = startGame;
 }
 
