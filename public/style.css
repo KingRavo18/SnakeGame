@@ -1,12 +1,23 @@
 body{
     margin: 0;
     font-family: monospace;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 h1{
     text-align: center;
     font-size: 3vw;
 }
+#score{
+    margin-top: -20px;
+    width: 500px;
+    text-align: right;
+    font-size: 1.1vw;
+    padding-right: 50px;
+}
 main{
+    margin-top: -10px;
     display: flex;
     justify-content: center; 
 
