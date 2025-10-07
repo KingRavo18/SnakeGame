@@ -8,6 +8,8 @@ const Player = {
     move_direction: undefined,
     positionX: undefined,
     positionY: undefined,
+    death_sound: new Audio("Assets/Audio/explosion-312361.mp3"),    
+    score: 0,
 };
 const Fruit = {
     item: document.createElement("div"),
@@ -103,6 +105,10 @@ function game(){
         return gameOver();
     }
     GameBoard.grid[Player.positionY][Player.positionX].appendChild(Player.avatar);
+    if(Player.positionX === Fruit.positionX && Player.positionY === Fruit.positionY){
+        GameBoard.grid[Fruit.positionY][Fruit.positionX].removeChild(Fruit.item);
+        Fruit.amount_generated--;
+    }
 }
 
 function fruit(){
@@ -120,6 +126,7 @@ function fruit(){
 }
 
 function gameOver(){
+    Player.death_sound.play();
     clearInterval(interval);
     start_button.textContent = "RESTART";
     start_button.style.display = "block";
