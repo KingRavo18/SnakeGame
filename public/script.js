@@ -5,16 +5,16 @@ document.addEventListener("DOMContentLoaded", () => {
 const start_button = document.getElementById("start_btn");
 const Player = {
     avatar: document.createElement("div"),
-    move_direction: undefined,
-    positionX: undefined,
-    positionY: undefined,
+    move_direction: "right",
+    positionX: 0,
+    positionY: 0,
     death_sound: new Audio("Assets/Audio/explosion-312361.mp3"),    
-    score: 0,
+    fruit_picked_up: 0,
 };
 const Fruit = {
     item: document.createElement("div"),
-    positionX: undefined,
-    positionY: undefined,
+    positionX: 0,
+    positionY: 0,
     amount_generated: 0,
 };
 const GameBoard = {
@@ -24,11 +24,17 @@ const GameBoard = {
     grid: [],
     isGenerated: false,
 };
+
+//For now, these stay here
+Fruit.item.classList.add("fruit");
+Fruit.item.style.height = `${GameBoard.tile_size}px`;
+Fruit.item.style.width = `${GameBoard.tile_size}px`;
 const game_tick = 400;
 let interval = null;
 
 function startGame(){
     start_button.style.display = "none";
+    Player.fruit_picked_up = 0;
     setupGame();
     avatarDirection();
     interval = setInterval(game, game_tick);
@@ -84,9 +90,9 @@ function avatarDirection(){
 }
 
 function game(){
+    document.getElementById("score").textContent = `SCORE: ${Player.fruit_picked_up * 100}`;
     fruit();
     GameBoard.grid[Player.positionY][Player.positionX].removeChild(Player.avatar);
-
     switch(Player.move_direction){
         case "right":
             Player.positionX += 1;
@@ -101,24 +107,21 @@ function game(){
             Player.positionY -= 1;
             break;
     }
-    if(Player.positionX >= GameBoard.tile_x_amount || Player.positionY >= GameBoard.tile_y_amount || Player.positionX < 0 || Player.positionY < 0){
-        return gameOver();
-    }
+    gameOver();
     GameBoard.grid[Player.positionY][Player.positionX].appendChild(Player.avatar);
     if(Player.positionX === Fruit.positionX && Player.positionY === Fruit.positionY){
+        Player.fruit_picked_up++;
         GameBoard.grid[Fruit.positionY][Fruit.positionX].removeChild(Fruit.item);
         Fruit.amount_generated--;
     }
 }
 
+// If there is no fruit, this function places the fruit on a random tile
 function fruit(){
     if(Fruit.amount_generated < 1){
-        Fruit.item.classList.add("fruit");
-        Fruit.item.style.height = `${GameBoard.tile_size}px`;
-        Fruit.item.style.width = `${GameBoard.tile_size}px`;
         do{
-            Fruit.positionY = Math.round(Math.random() * (GameBoard.tile_y_amount + 1));
-            Fruit.positionX = Math.round(Math.random() * (GameBoard.tile_x_amount + 1));
+            Fruit.positionY = Math.floor(Math.random() * (GameBoard.tile_y_amount + 1));
+            Fruit.positionX = Math.floor(Math.random() * (GameBoard.tile_x_amount + 1));
         }while(Fruit.positionY === Player.positionY && Fruit.positionX === Player.positionX);
         GameBoard.grid[Fruit.positionY][Fruit.positionX].appendChild(Fruit.item);
         Fruit.amount_generated++;
@@ -126,10 +129,12 @@ function fruit(){
 }
 
 function gameOver(){
-    Player.death_sound.play();
-    clearInterval(interval);
-    start_button.textContent = "RESTART";
-    start_button.style.display = "block";
-    start_button.onclick = startGame;
+    if(Player.positionX >= GameBoard.tile_x_amount || Player.positionY >= GameBoard.tile_y_amount || Player.positionX < 0 || Player.positionY < 0){
+        Player.death_sound.play();
+        clearInterval(interval);
+        start_button.textContent = "RESTART";
+        start_button.style.display = "block";
+        start_button.onclick = startGame;
+    }
 }
 
