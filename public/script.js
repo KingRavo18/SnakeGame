@@ -126,8 +126,8 @@ function game(start_button, interval){
 function fruit(){
     if(Fruit.amount_generated < 1){
         do{
-            Fruit.positionY = Math.floor(Math.random() * (GameBoard.tile_y_amount));
-            Fruit.positionX = Math.floor(Math.random() * (GameBoard.tile_x_amount));
+            Fruit.positionY = Math.floor(Math.random() * GameBoard.tile_y_amount);
+            Fruit.positionX = Math.floor(Math.random() * GameBoard.tile_x_amount);
         }while(Fruit.positionY === Player.positionY && Fruit.positionX === Player.positionX);
         GameBoard.grid[Fruit.positionY][Fruit.positionX].appendChild(Fruit.item);
         Fruit.amount_generated++;
