@@ -3,7 +3,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 const Player = {
-    avatar: document.createElement("div"),
     move_direction: "right",
     positionX: 0,
     positionY: 0, 
@@ -33,24 +32,30 @@ function startGame(){
     const game_tick = 400;
     const start_button = document.getElementById("start_btn");
     start_button.style.display = "none";
+    let interval = null
     Player.fruit_picked_up = 0;
 
-    createAvatar();
-    setupBoard();
-    avatarDirection();
-    let interval = setInterval(() => game(start_button, interval), game_tick);
+    const avatar = createAvatar();
+    setupBoard(avatar);
+    playerDirection();
+
+    game(avatar, start_button, interval);
+    interval = setInterval(() => game(avatar, start_button, interval), game_tick);
 }
 
 function createAvatar(){
-    Player.avatar.classList.add("player_avatar");
-    Player.avatar.style.height = `${GameBoard.tile_size}px`;
-    Player.avatar.style.width = `${GameBoard.tile_size}px`;
+    const avatar_block = document.createElement("div");
+    avatar_block.classList.add("player_avatar");
+    avatar_block.style.height = `${GameBoard.tile_size}px`;
+    avatar_block.style.width = `${GameBoard.tile_size}px`;
+    return avatar_block;
 }
 
-function setupBoard(){
+function setupBoard(avatar){
     if(!GameBoard.isGenerated){
         GameBoard.isGenerated = true;
         const game_screen = document.getElementById("game_screen");
+        game_screen.style.border = "2px solid black";
         game_screen.style.width = `${GameBoard.tile_size * GameBoard.tile_x_amount + 18}px`;
         game_screen.style.height = `${GameBoard.tile_size * GameBoard.tile_y_amount + 18}px`;
 
@@ -70,10 +75,10 @@ function setupBoard(){
     }
     Player.positionX = 6;
     Player.positionY = 6;
-    GameBoard.grid[Player.positionY][Player.positionX].appendChild(Player.avatar);
+    GameBoard.grid[Player.positionY][Player.positionX].appendChild(avatar);
 }
 
-function avatarDirection(){
+function playerDirection(){
     Player.move_direction = "right";
     document.addEventListener("keydown", event => {
         switch(event.key){
@@ -93,10 +98,10 @@ function avatarDirection(){
     });
 }
 
-function game(start_button, interval){
+function game(avatar, start_button, interval){
     document.getElementById("score").textContent = `SCORE: ${Player.fruit_picked_up * 100}`;
     fruit();
-    GameBoard.grid[Player.positionY][Player.positionX].removeChild(Player.avatar);
+    GameBoard.grid[Player.positionY][Player.positionX].removeChild(avatar);
     switch(Player.move_direction){
         case "right":
             Player.positionX += 1;
@@ -112,16 +117,17 @@ function game(start_button, interval){
             break;
     }
     if(Player.positionX >= GameBoard.tile_x_amount || Player.positionY >= GameBoard.tile_y_amount || Player.positionX < 0 || Player.positionY < 0){
+        removeFruit();
         return gameOver(start_button, interval);
     }
     
-    GameBoard.grid[Player.positionY][Player.positionX].appendChild(Player.avatar);
+    GameBoard.grid[Player.positionY][Player.positionX].appendChild(avatar);
     if(Player.positionX === Fruit.positionX && Player.positionY === Fruit.positionY){
-        Player.fruit_picked_up++;
-        GameBoard.grid[Fruit.positionY][Fruit.positionX].removeChild(Fruit.item);
-        Fruit.amount_generated--;
+        new Audio("Assets/Audio/fruit-pickup-sound.wav").play();
+        removeFruit();
     }
 }
+
 // If there is no fruit, this function places the fruit on a random tile
 function fruit(){
     if(Fruit.amount_generated < 1){
@@ -134,11 +140,19 @@ function fruit(){
     }
 }
 
+function removeFruit(){h
+    GameBoard.grid[Fruit.positionY][Fruit.positionX].removeChild(Fruit.item);
+    Player.fruit_picked_up++;
+    Fruit.amount_generated--;
+}
+
 function gameOver(start_button, interval){
     clearInterval(interval);
-    new Audio("Assets/Audio/explosion-312361.mp3").play();
-    start_button.textContent = "RESTART";
-    start_button.style.display = "block";
-    start_button.onclick = startGame;
+    new Audio("Assets/Audio/player-death-sound.mp3").play();
+    setTimeout(() => {
+        start_button.textContent = "RESTART";
+        start_button.style.display = "block";
+        start_button.onclick = startGame;
+    }, 1000);
 }
 

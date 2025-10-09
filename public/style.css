@@ -25,7 +25,7 @@ main{
         display: flex;
         flex-wrap: wrap;
         padding: 0;
-        border: 2px solid black;
+        border: none;
 
         & button {
             background-color: rgb(209, 2, 2);
