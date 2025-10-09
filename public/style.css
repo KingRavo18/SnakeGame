@@ -6,6 +6,7 @@ body{
     align-items: center;
 }
 h1{
+    margin-top: 15px;
     text-align: center;
     font-size: 3vw;
 }
@@ -15,6 +16,7 @@ h1{
     text-align: right;
     font-size: 1.1vw;
     padding-right: 50px;
+    font-weight: bold;
 }
 main{
     margin-top: -10px;
@@ -24,8 +26,22 @@ main{
     & #game_screen{
         display: flex;
         flex-wrap: wrap;
+        justify-content: center;
         padding: 0;
         border: none;
+
+        & .lose_message{
+            text-align: center;
+            border: 2px solid rgb(209, 2, 2);
+            position: absolute;
+            margin-top: 30px;
+            font-size: 5vw;
+            background-color: white;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            color: rgb(209, 2, 2);
+        }
 
         & button {
             background-color: rgb(209, 2, 2);
@@ -33,6 +49,7 @@ main{
             border: none;
             border-radius: 5px;
             padding: 7px 14px;
+            font-weight: bold;
             font-size: 1.3vw;
             position: absolute;
             top: 50%;
