@@ -23,6 +23,7 @@ const GameBoard = {
 
 function startGame(){
     new Audio("Assets/Audio/button-click-sound.wav").play();
+    const pointsForVictory = GameBoard.tile_x_amount * GameBoard.tile_y_amount - 1;
     const game_tick = 400;
     const tile_size = 40;
     const start_button = document.getElementById("start_btn");
@@ -34,8 +35,8 @@ function startGame(){
     setupBoard(avatar, tile_size);
     playerDirection();
 
-    game(avatar, start_button, tile_size, interval);
-    interval = setInterval(() => game(avatar, start_button, tile_size, interval), game_tick);
+    game(avatar, start_button, tile_size, interval, pointsForVictory);
+    interval = setInterval(() => game(avatar, start_button, tile_size, interval, pointsForVictory), game_tick);
 }
 
 function createAvatar(tile_size){
@@ -93,7 +94,7 @@ function playerDirection(){
     });
 }
 
-function game(avatar, start_button, tile_size, interval){
+function game(avatar, start_button, tile_size, interval, pointsForVictory){
     document.getElementById("score").textContent = `SCORE: ${Player.fruit_picked_up * 100}`;
     if(Fruit.amount_generated < 1){
         fruit(tile_size);
@@ -116,12 +117,15 @@ function game(avatar, start_button, tile_size, interval){
     if(Player.positionX >= GameBoard.tile_x_amount || Player.positionY >= GameBoard.tile_y_amount || Player.positionX < 0 || Player.positionY < 0){
         return gameOver(start_button, interval);
     }
-    
     GameBoard.grid[Player.positionY][Player.positionX].appendChild(avatar);
     if(Player.positionX === Fruit.positionX && Player.positionY === Fruit.positionY){
         new Audio("Assets/Audio/fruit-pickup-sound.wav").play();
         removeFruit();
     }
+    if(Player.fruit_picked_up >= pointsForVictory){
+        victory(start_button, interval, avatar);
+    }
+    document.getElementById("score").textContent = `SCORE: ${Player.fruit_picked_up * 100}`;
 }
 
 // Place a fruit on a random tile, but not the tile the player is located
@@ -165,3 +169,20 @@ function gameOver(start_button, interval){
     }, 1000);
 }
 
+function victory(start_button, interval, avatar){
+    clearInterval(interval);
+    new Audio("Assets/Audio/victory-sound.wav").play();
+    const game_screen = document.getElementById("game_screen");
+    const win_message = document.createElement("p");
+    win_message.classList.add("win_message");
+    win_message.textContent = "YOU WIN!";
+    game_screen.appendChild(win_message);
+
+    start_button.textContent = "PLAY AGAIN!";
+    start_button.style.display = "block";
+    start_button.onclick = () => {
+        GameBoard.grid[Player.positionY][Player.positionX].removeChild(avatar);
+        game_screen.removeChild(win_message);
+        startGame();
+    }
+}
