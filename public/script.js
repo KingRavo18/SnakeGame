@@ -24,7 +24,7 @@ const GameBoard = {
 function startGame(){
     new Audio("Assets/Audio/button-click-sound.wav").play();
     const pointsForVictory = GameBoard.tile_x_amount * GameBoard.tile_y_amount - 1;
-    const game_tick = 400;
+    const game_tick = 150;
     const tile_size = 40;
     const start_button = document.getElementById("start_btn");
     start_button.style.display = "none";
@@ -79,19 +79,26 @@ function playerDirection(){
     document.addEventListener("keydown", event => {
         switch(event.key){
             case "ArrowRight":
-                Player.move_direction = "right";
+                directionForbid("left", "right");
                 break;
             case "ArrowDown":
-                Player.move_direction = "down";
+                directionForbid("up", "down");
                 break;
             case "ArrowLeft":
-                Player.move_direction = "left";
+                directionForbid("right", "left");
                 break;
             case "ArrowUp":
-                Player.move_direction = "up";
+                directionForbid("down", "up");
                 break;
         }
     });
+}
+
+function directionForbid(oppositeDirection, selectedDirection){
+    if(Player.move_direction === oppositeDirection){
+        return;
+    }
+    Player.move_direction = selectedDirection;
 }
 
 function game(avatar, start_button, tile_size, interval, pointsForVictory){
