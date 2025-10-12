@@ -1,21 +1,21 @@
 document.addEventListener("DOMContentLoaded", () => {
-    document.addEventListener("keydown", event => chooseDirection(event));
+    const direction_control = new DirectionControl();
+    document.addEventListener("keydown", event => direction_control.chooseDirection(event));
     const start_game = new GameSetup();
     document.getElementById("start_btn").onclick = () => start_game.setGame();
 });
 
 // To do:
-// Do something with the classless objects and functions
 // Make a tail for the avatar
 // Give collision to the tail
 // Figure out what is going on with the +18 pixel thing
 
-
+//These cannot be incorporated into any classes. If I try, nothing works
 const Player = {
-    move_direction: "right",
     positionX: 0,
     positionY: 0, 
     fruit_picked_up: 0,
+    move_direction: "right",
 };
 const Fruit = {
     item: undefined,
@@ -24,30 +24,32 @@ const Fruit = {
     amount_generated: 0,
 };
 
-function chooseDirection(event){
-    switch(event.key){
-        case "ArrowRight":
-            forbidDirection("left", "right");
-            break;
-        case "ArrowDown":
-            forbidDirection("up", "down");
-            break;
-        case "ArrowLeft":
-            forbidDirection("right", "left");
-            break;
-        case "ArrowUp":
-            forbidDirection("down", "up");
-            break;
+class DirectionControl{
+
+    chooseDirection(event){
+        switch(event.key){
+            case "ArrowRight":
+                this.forbidDirection("left", "right");
+                break;
+            case "ArrowDown":
+                this.forbidDirection("up", "down");
+                break;
+            case "ArrowLeft":
+                this.forbidDirection("right", "left");
+                break;
+            case "ArrowUp":
+                this.forbidDirection("down", "up");
+                break;
+        }
+    }
+    forbidDirection(oppositeDirection, selectedDirection){
+        if(Player.move_direction === oppositeDirection) return;
+        Player.move_direction = selectedDirection;
     }
 }
 
-function forbidDirection(oppositeDirection, selectedDirection){
-    if(Player.move_direction === oppositeDirection) return;
-    Player.move_direction = selectedDirection;
-}
-
-
 class GameSetup{
+
     GameAudio = {
         btn_click: "Assets/Audio/button-click-sound.wav", 
         player_death: "Assets/Audio/player-death-sound.mp3",
@@ -63,6 +65,7 @@ class GameSetup{
 
     start_button = document.getElementById("start_btn");
     pointsForVictory = this.GameRules.tile_x_amount * this.GameRules.tile_y_amount - 1;
+    fruit_picked_up = 0;
 
     setGame(){
         const avatar = this.setAvatar();
@@ -117,6 +120,7 @@ class GameSetup{
 }
 
 class Game extends GameSetup{
+
     game(avatar, grid, game_board, interval){
         if(Fruit.amount_generated < 1){
             this.generateFruit(grid);
