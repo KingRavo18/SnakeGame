@@ -23,12 +23,12 @@ main{
     display: flex;
     justify-content: center; 
 
-    & #game_screen{
+    & .game_board{
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
         padding: 0;
-        border: none;
+        border: 2px solid black;
 
         & .lose_message{
             text-align: center;
@@ -58,27 +58,6 @@ main{
             z-index: 10;
         }
 
-        & button {
-            background-color: rgb(209, 2, 2);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 7px 14px;
-            font-weight: bold;
-            font-size: 1.3vw;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            cursor: pointer;
-            transition: 0.5s;
-            z-index: 10;
-            transform: translate(-50%, -50%);
-
-            &:hover{
-              background-color: rgb(253, 124, 124);  
-            }
-        }
-
         .grid_tile{
             background-color: white;
             margin: 0;
@@ -99,6 +78,27 @@ main{
             background-color: red;
             border: 1px solid white;
             border-radius: 50%;
+        }
+    }
+
+    & button {
+        background-color: rgb(209, 2, 2);
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 7px 14px;
+        font-weight: bold;
+        font-size: 1.3vw;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        cursor: pointer;
+        transition: 0.5s;
+        z-index: 10;
+        transform: translate(-50%, -50%);
+
+        &:hover{
+            background-color: rgb(253, 124, 124);  
         }
     }
 }

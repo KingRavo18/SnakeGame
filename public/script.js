@@ -1,6 +1,15 @@
 document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById("start_btn").onclick = () => startGame();
+    document.addEventListener("keydown", event => chooseDirection(event));
+    const start_game = new GameSetup();
+    document.getElementById("start_btn").onclick = () => start_game.setGame();
 });
+
+// To do:
+// Do something with the classless objects and functions
+// Make a tail for the avatar
+// Give collision to the tail
+// Figure out what is going on with the +18 pixel thing
+
 
 const Player = {
     move_direction: "right",
@@ -14,182 +23,200 @@ const Fruit = {
     positionY: 0,
     amount_generated: 0,
 };
-const GameBoard = {
-    tile_x_amount: 12,
-    tile_y_amount: 12,
-    grid: [],
-    isGenerated: false,
-};
 
-function startGame(){
-    new Audio("Assets/Audio/button-click-sound.wav").play();
-    const pointsForVictory = GameBoard.tile_x_amount * GameBoard.tile_y_amount - 1;
-    const game_tick = 150;
-    const tile_size = 40;
-    const start_button = document.getElementById("start_btn");
-    start_button.style.display = "none";
-    let interval = null
-    Player.fruit_picked_up = 0;
-
-    const avatar = createAvatar(tile_size);
-    setupBoard(avatar, tile_size);
-    playerDirection();
-
-    game(avatar, start_button, tile_size, interval, pointsForVictory);
-    interval = setInterval(() => game(avatar, start_button, tile_size, interval, pointsForVictory), game_tick);
-}
-
-function createAvatar(tile_size){
-    const avatar_block = document.createElement("div");
-    avatar_block.classList.add("player_avatar");
-    avatar_block.style.height = `${tile_size}px`;
-    avatar_block.style.width = `${tile_size}px`;
-    return avatar_block;
-}
-
-function setupBoard(avatar, tile_size){
-    if(!GameBoard.isGenerated){
-        GameBoard.isGenerated = true;
-        const game_screen = document.getElementById("game_screen");
-        game_screen.style.border = "2px solid black";
-        game_screen.style.width = `${tile_size * GameBoard.tile_x_amount + 18}px`;
-        game_screen.style.height = `${tile_size * GameBoard.tile_y_amount + 18}px`;
-
-        // Loop to create the game 2.5D grid array
-        for(let i = 0; i < GameBoard.tile_y_amount; i++){
-            const x_array = [];
-            for(let j = 0; j < GameBoard.tile_x_amount; j++){
-                const grid_tile = document.createElement("div");
-                grid_tile.style.height = `${tile_size}px`;
-                grid_tile.style.width = `${tile_size}px`;
-                grid_tile.classList.add("grid_tile");
-                game_screen.appendChild(grid_tile);
-                x_array.push(grid_tile);
-            }  
-            GameBoard.grid.push(x_array);
-        }
+function chooseDirection(event){
+    switch(event.key){
+        case "ArrowRight":
+            forbidDirection("left", "right");
+            break;
+        case "ArrowDown":
+            forbidDirection("up", "down");
+            break;
+        case "ArrowLeft":
+            forbidDirection("right", "left");
+            break;
+        case "ArrowUp":
+            forbidDirection("down", "up");
+            break;
     }
-    Player.positionX = 6;
-    Player.positionY = 6;
-    GameBoard.grid[Player.positionY][Player.positionX].appendChild(avatar);
 }
 
-function playerDirection(){
-    Player.move_direction = "right";
-    document.addEventListener("keydown", event => {
-        switch(event.key){
-            case "ArrowRight":
-                directionForbid("left", "right");
-                break;
-            case "ArrowDown":
-                directionForbid("up", "down");
-                break;
-            case "ArrowLeft":
-                directionForbid("right", "left");
-                break;
-            case "ArrowUp":
-                directionForbid("down", "up");
-                break;
-        }
-    });
-}
-
-function directionForbid(oppositeDirection, selectedDirection){
-    if(Player.move_direction === oppositeDirection){
-        return;
-    }
+function forbidDirection(oppositeDirection, selectedDirection){
+    if(Player.move_direction === oppositeDirection) return;
     Player.move_direction = selectedDirection;
 }
 
-function game(avatar, start_button, tile_size, interval, pointsForVictory){
-    document.getElementById("score").textContent = `SCORE: ${Player.fruit_picked_up * 100}`;
-    if(Fruit.amount_generated < 1){
-        fruit(tile_size);
-    }
-    GameBoard.grid[Player.positionY][Player.positionX].removeChild(avatar);
-    switch(Player.move_direction){
-        case "right":
-            Player.positionX += 1;
-            break;
-        case "down":
-            Player.positionY += 1;
-            break;
-        case "left":
-            Player.positionX -= 1;
-            break;
-        case "up":
-            Player.positionY -= 1;
-            break;
-    }
-    if(Player.positionX >= GameBoard.tile_x_amount || Player.positionY >= GameBoard.tile_y_amount || Player.positionX < 0 || Player.positionY < 0){
-        return gameOver(start_button, interval);
-    }
-    GameBoard.grid[Player.positionY][Player.positionX].appendChild(avatar);
-    if(Player.positionX === Fruit.positionX && Player.positionY === Fruit.positionY){
-        new Audio("Assets/Audio/fruit-pickup-sound.wav").play();
-        removeFruit();
-    }
-    if(Player.fruit_picked_up >= pointsForVictory){
-        victory(start_button, interval, avatar);
-    }
-    document.getElementById("score").textContent = `SCORE: ${Player.fruit_picked_up * 100}`;
-}
 
-// Place a fruit on a random tile, but not the tile the player is located
-function fruit(tile_size){
-    Fruit.item = document.createElement("div");
-    Fruit.item.classList.add("fruit");
-    Fruit.item.style.height = `${tile_size}px`;
-    Fruit.item.style.width = `${tile_size}px`; 
-    do{
-        Fruit.positionY = Math.floor(Math.random() * GameBoard.tile_y_amount);
-        Fruit.positionX = Math.floor(Math.random() * GameBoard.tile_x_amount);
-    }while(Fruit.positionY === Player.positionY && Fruit.positionX === Player.positionX);
-    GameBoard.grid[Fruit.positionY][Fruit.positionX].appendChild(Fruit.item);
-    Fruit.amount_generated++;  
-}
+class GameSetup{
+    GameAudio = {
+        btn_click: "Assets/Audio/button-click-sound.wav", 
+        player_death: "Assets/Audio/player-death-sound.mp3",
+        fruit_pickup: "Assets/Audio/fruit-pickup-sound.wav",
+        player_victory: "Assets/Audio/victory-sound.wav",
+    };
+    GameRules = {
+        game_tick: 150,
+        tile_size: 40,
+        tile_x_amount: 12,
+        tile_y_amount: 12,
+    };
 
-function removeFruit(){
-    GameBoard.grid[Fruit.positionY][Fruit.positionX].removeChild(Fruit.item);
-    Player.fruit_picked_up++;
-    Fruit.amount_generated--;
-}
+    start_button = document.getElementById("start_btn");
+    pointsForVictory = this.GameRules.tile_x_amount * this.GameRules.tile_y_amount - 1;
 
-function gameOver(start_button, interval){
-    clearInterval(interval);
-    new Audio("Assets/Audio/player-death-sound.mp3").play();
-    setTimeout(() => {
-        removeFruit();
+    setGame(){
+        const avatar = this.setAvatar();
+        const {grid, game_board} = this.setBoard(avatar);
+        Player.move_direction = "right"; 
+        Player.fruit_picked_up = 0;
 
-        const game_screen = document.getElementById("game_screen");
-        const lose_message = document.createElement("p");
-        lose_message.classList.add("lose_message");
-        lose_message.textContent = "YOU LOSE!";
-        game_screen.appendChild(lose_message);
+        new Audio(this.GameAudio.btn_click).play();
+        this.start_button.style.display = "none";
 
-        start_button.textContent = "RESTART";
-        start_button.style.display = "block";
-        start_button.onclick = () => {
-            game_screen.removeChild(lose_message);
-            startGame();
+        let interval = setInterval(() => {
+            const gameConn = new Game();
+            gameConn.game(avatar, grid, game_board, interval);
+        }, this.GameRules.game_tick);
+    }
+
+    setAvatar(){
+        const avatar = document.createElement("div");
+        avatar.classList.add("player_avatar");
+        avatar.style.height = `${this.GameRules.tile_size}px`;
+        avatar.style.width = `${this.GameRules.tile_size}px`;
+        return avatar;
+    }
+
+    setBoard(avatar){
+        const grid = [];
+        const game_board = document.createElement("div");
+        game_board.classList.add("game_board");
+        game_board.style.width = `${this.GameRules.tile_size * this.GameRules.tile_x_amount + 18}px`;
+        game_board.style.height = `${this.GameRules.tile_size * this.GameRules.tile_y_amount + 18}px`;
+
+        // Loop to create the game 2D grid array
+        for(let i = 0; i < this.GameRules.tile_y_amount; i++){
+            const x_array = [];
+            for(let j = 0; j < this.GameRules.tile_x_amount; j++){
+                const grid_tile = document.createElement("div");
+                grid_tile.classList.add("grid_tile");
+                grid_tile.style.width = `${this.GameRules.tile_size}px`;
+                grid_tile.style.height = `${this.GameRules.tile_size}px`;
+                game_board.appendChild(grid_tile);
+                x_array.push(grid_tile);
+            }  
+            grid.push(x_array);
         }
-    }, 1000);
+        document.getElementById("game_screen").appendChild(game_board);
+
+        Player.positionX = 6;
+        Player.positionY = 6;
+        grid[Player.positionY][Player.positionX].appendChild(avatar);
+        return {grid, game_board};
+    }
 }
 
-function victory(start_button, interval, avatar){
-    clearInterval(interval);
-    new Audio("Assets/Audio/victory-sound.wav").play();
-    const game_screen = document.getElementById("game_screen");
-    const win_message = document.createElement("p");
-    win_message.classList.add("win_message");
-    win_message.textContent = "YOU WIN!";
-    game_screen.appendChild(win_message);
+class Game extends GameSetup{
+    game(avatar, grid, game_board, interval){
+        if(Fruit.amount_generated < 1){
+            this.generateFruit(grid);
+        }
+        this.moveAvatar(avatar, grid, game_board, interval);
+        if(Player.positionX === Fruit.positionX && Player.positionY === Fruit.positionY){
+            new Audio(this.GameAudio.fruit_pickup).play();
+            this.removeFruit(grid);
+        }
+        if(Player.fruit_picked_up >= this.pointsForVictory){
+            this.victory(interval, avatar, grid, game_board);
+        } 
+        document.getElementById("score").textContent = `SCORE: ${Player.fruit_picked_up * 100}`;
+    }
 
-    start_button.textContent = "PLAY AGAIN!";
-    start_button.style.display = "block";
-    start_button.onclick = () => {
-        GameBoard.grid[Player.positionY][Player.positionX].removeChild(avatar);
-        game_screen.removeChild(win_message);
-        startGame();
+    // Place a fruit on a random tile, but not the tile the player is located
+    generateFruit(grid){
+        Fruit.item = document.createElement("div");
+        Fruit.item.classList.add("fruit");
+        Fruit.item.style.height = `${this.GameRules.tile_size}px`;
+        Fruit.item.style.width = `${this.GameRules.tile_size}px`; 
+        do{
+            Fruit.positionY = Math.floor(Math.random() * this.GameRules.tile_y_amount);
+            Fruit.positionX = Math.floor(Math.random() * this.GameRules.tile_x_amount);
+        }while(Fruit.positionY === Player.positionY && Fruit.positionX === Player.positionX);
+        grid[Fruit.positionY][Fruit.positionX].appendChild(Fruit.item);
+        Fruit.amount_generated++;  
+    }
+
+    moveAvatar(avatar, grid, game_board, interval){
+        grid[Player.positionY][Player.positionX].removeChild(avatar);
+        this.checkDirection();
+
+        if(Player.positionX >= this.GameRules.tile_x_amount || Player.positionY >= this.GameRules.tile_y_amount || Player.positionX < 0 || Player.positionY < 0){
+            return this.gameOver(grid, game_board, interval);
+        }
+
+        grid[Player.positionY][Player.positionX].appendChild(avatar);
+    }
+
+    checkDirection(){
+        switch(Player.move_direction){
+            case "right":
+                Player.positionX += 1;
+                break;
+            case "down":
+                Player.positionY += 1;
+                break;
+            case "left":
+                Player.positionX -= 1;
+                break;
+            case "up":
+                Player.positionY -= 1;
+                break;
+        }
+    }
+
+    gameOver(grid, game_board, interval){
+        clearInterval(interval);
+        new Audio(this.GameAudio.player_death).play();
+        setTimeout(() => {
+            this.removeFruit(grid);
+
+            const lose_message = document.createElement("p");
+            lose_message.classList.add("lose_message");
+            lose_message.textContent = "YOU LOSE!";
+            game_board.appendChild(lose_message);
+
+            this.start_button.textContent = "RESTART";
+            this.start_button.style.display = "block";
+            this.start_button.onclick = () => {
+                game_board.removeChild(lose_message);
+                document.getElementById("game_screen").removeChild(game_board);
+                this.setGame();
+            }
+        }, 1000);
+    }
+
+    removeFruit(grid){
+        grid[Fruit.positionY][Fruit.positionX].removeChild(Fruit.item);
+        Player.fruit_picked_up++;
+        Fruit.amount_generated--;
+    }
+
+    victory(interval, avatar, grid, game_board){
+        clearInterval(interval);
+        new Audio(this.GameAudio.player_victory).play();
+
+        const win_message = document.createElement("p");
+        win_message.classList.add("win_message");
+        win_message.textContent = "YOU WIN!";
+        game_board.appendChild(win_message);
+
+        this.start_button.textContent = "PLAY AGAIN!";
+        this.start_button.style.display = "block";
+        this.start_button.onclick = () => {
+            grid[Player.positionY][Player.positionX].removeChild(avatar);
+            game_board.removeChild(win_message);
+            document.getElementById("game_screen").removeChild(game_board);
+            this.setGame();
+        }
     }
 }
