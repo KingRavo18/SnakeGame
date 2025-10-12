@@ -10,6 +10,24 @@
 <body>
     <h1>SNAKE</h1>
     <p id="score"></p>
+    <div id="input-window">
+        <label for="tile_number_x">
+            Horizontal tile amount:
+            <input type="number" id="tile_number_x" value="12">
+        </label>
+        <label for="tile_number_y">
+            Vertical tile amount:
+            <input type="number" id="tile_number_y" value="12">
+        </label>
+        <label for="tile_size">
+            Tile size
+            <input type="number" id="tile_size" value="35">
+        </label>
+        <label for="tick_speed">
+            Game speed (The lower, the faster)
+            <input type="number" id="tick_speed" value="150">
+        </label>
+    </div>
     <main id="game_screen">
         <button id="start_btn">START</button>
     </main>

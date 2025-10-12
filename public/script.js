@@ -56,19 +56,15 @@ class GameSetup{
         fruit_pickup: "Assets/Audio/fruit-pickup-sound.wav",
         player_victory: "Assets/Audio/victory-sound.wav",
     };
-    GameRules = {
-        game_tick: 150,
-        tile_size: 35,
-        tile_x_amount: 14,
-        tile_y_amount: 14,
-    };
 
     start_button = document.getElementById("start_btn");
-    pointsForVictory = this.GameRules.tile_x_amount * this.GameRules.tile_y_amount - 1;
+    input_control = document.getElementById("input-window");
 
     setGame(){
-        const avatar = this.setAvatar();
-        const {grid, game_board} = this.setBoard(avatar);
+        const {game_tick, tile_size, tile_x_amount, tile_y_amount} = this.setGameRules();
+        const avatar = this.setAvatar(tile_size);
+        const {grid, game_board} = this.setBoard(avatar, tile_x_amount, tile_y_amount, tile_size);
+        const pointsForVictory = tile_x_amount * tile_y_amount - 1;
         Player.move_direction = "right"; 
         Player.fruit_picked_up = 0;
 
@@ -77,33 +73,42 @@ class GameSetup{
 
         let interval = setInterval(() => {
             const gameConn = new Game();
-            gameConn.game(avatar, grid, game_board, interval);
-        }, this.GameRules.game_tick);
+            gameConn.game(avatar, grid, game_board, tile_x_amount, tile_y_amount, tile_size, pointsForVictory, interval);
+        }, game_tick);
     }
 
-    setAvatar(){
+    setGameRules(){
+        const game_tick = document.getElementById("tick_speed").value;
+        const tile_x_amount = document.getElementById("tile_number_x").value;
+        const tile_y_amount = document.getElementById("tile_number_y").value;
+        const tile_size = document.getElementById("tile_size").value;
+        this.input_control.style.visibility = "hidden";
+        return {game_tick, tile_size, tile_x_amount, tile_y_amount};
+    }
+
+    setAvatar(tile_size){
         const avatar = document.createElement("div");
         avatar.classList.add("player_avatar");
-        avatar.style.height = `${this.GameRules.tile_size}px`;
-        avatar.style.width = `${this.GameRules.tile_size}px`;
+        avatar.style.height = `${tile_size}px`;
+        avatar.style.width = `${tile_size}px`;
         return avatar;
     }
 
-    setBoard(avatar){
+    setBoard(avatar, tile_x_amount, tile_y_amount, tile_size){
         const grid = [];
         const game_board = document.createElement("div");
         game_board.classList.add("game_board");
 
         // Loop to create the game 2D grid array
-        for(let i = 0; i < this.GameRules.tile_y_amount; i++){
+        for(let i = 0; i < tile_y_amount; i++){
             const x_array = [];
             const game_board_row = document.createElement("div");
             game_board_row.classList.add("game_board_row");
-            for(let j = 0; j < this.GameRules.tile_x_amount; j++){
+            for(let j = 0; j < tile_x_amount; j++){
                 const grid_tile = document.createElement("div");
                 grid_tile.classList.add("grid_tile");
-                grid_tile.style.width = `${this.GameRules.tile_size}px`;
-                grid_tile.style.height = `${this.GameRules.tile_size}px`;
+                grid_tile.style.width = `${tile_size}px`;
+                grid_tile.style.height = `${tile_size}px`;
                 x_array.push(grid_tile);
                 game_board_row.appendChild(grid_tile);
             } 
@@ -121,40 +126,40 @@ class GameSetup{
 
 class Game extends GameSetup{
 
-    game(avatar, grid, game_board, interval){
+    game(avatar, grid, game_board, tile_x_amount, tile_y_amount, tile_size, pointsForVictory, interval){
         if(Fruit.amount_generated < 1){
-            this.generateFruit(grid);
+            this.generateFruit(grid, tile_x_amount, tile_y_amount, tile_size);
         }
-        this.moveAvatar(avatar, grid, game_board, interval);
+        this.moveAvatar(avatar, grid, game_board, tile_x_amount, tile_y_amount, interval);
         if(Player.positionX === Fruit.positionX && Player.positionY === Fruit.positionY){
             new Audio(this.GameAudio.fruit_pickup).play();
             this.removeFruit(grid);
         }
-        if(Player.fruit_picked_up >= this.pointsForVictory){
+        if(Player.fruit_picked_up >= pointsForVictory){
             this.victory(interval, avatar, grid, game_board);
         } 
         document.getElementById("score").textContent = `SCORE: ${Player.fruit_picked_up * 100}`;
     }
 
     // Place a fruit on a random tile, but not the tile the player is located
-    generateFruit(grid){
+    generateFruit(grid, tile_x_amount, tile_y_amount, tile_size){
         Fruit.item = document.createElement("div");
         Fruit.item.classList.add("fruit");
-        Fruit.item.style.height = `${this.GameRules.tile_size}px`;
-        Fruit.item.style.width = `${this.GameRules.tile_size}px`; 
+        Fruit.item.style.height = `${tile_size}px`;
+        Fruit.item.style.width = `${tile_size}px`; 
         do{
-            Fruit.positionY = Math.floor(Math.random() * this.GameRules.tile_y_amount);
-            Fruit.positionX = Math.floor(Math.random() * this.GameRules.tile_x_amount);
+            Fruit.positionY = Math.floor(Math.random() * tile_y_amount);
+            Fruit.positionX = Math.floor(Math.random() * tile_x_amount);
         }while(Fruit.positionY === Player.positionY && Fruit.positionX === Player.positionX);
         grid[Fruit.positionY][Fruit.positionX].appendChild(Fruit.item);
         Fruit.amount_generated++;  
     }
 
-    moveAvatar(avatar, grid, game_board, interval){
+    moveAvatar(avatar, grid, game_board, tile_x_amount, tile_y_amount, interval){
         grid[Player.positionY][Player.positionX].removeChild(avatar);
         this.checkDirection();
 
-        if(Player.positionX >= this.GameRules.tile_x_amount || Player.positionY >= this.GameRules.tile_y_amount || Player.positionX < 0 || Player.positionY < 0){
+        if(Player.positionX >= tile_x_amount || Player.positionY >= tile_y_amount || Player.positionX < 0 || Player.positionY < 0){
             return this.gameOver(grid, game_board, interval);
         }
 
@@ -191,6 +196,8 @@ class Game extends GameSetup{
 
             this.start_button.textContent = "RESTART";
             this.start_button.style.display = "block";
+            this.input_control.style.display = "block";
+            this.input_control.style.visibility = "visible";
             this.start_button.onclick = () => {
                 game_board.removeChild(lose_message);
                 document.getElementById("game_screen").removeChild(game_board);
@@ -216,6 +223,7 @@ class Game extends GameSetup{
 
         this.start_button.textContent = "PLAY AGAIN!";
         this.start_button.style.display = "block";
+        this.input_control.style.visibility = "visible";
         this.start_button.onclick = () => {
             grid[Player.positionY][Player.positionX].removeChild(avatar);
             game_board.removeChild(win_message);

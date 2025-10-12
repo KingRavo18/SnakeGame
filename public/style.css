@@ -18,6 +18,19 @@ h1{
     padding-right: 50px;
     font-weight: bold;
 }
+#input-window{
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    left: 10px;
+    top: 100px;
+    gap: 20px;
+
+    & label{
+        display: flex;
+        flex-direction: column;
+    }
+}
 main{
     margin-top: -10px;
     display: flex;
