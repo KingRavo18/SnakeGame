@@ -6,10 +6,6 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("defaultValues").onclick = () => start_game.selectDefaultValues();
 });
 
-// To do:
-// Make a tail for the avatar
-// Give collision to the tail
-
 //These cannot be incorporated into any classes. If I try, nothing works
 const Player = {
     positionX: 0,
