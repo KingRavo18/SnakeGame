@@ -28,10 +28,11 @@ h1{
     & label{
         display: flex;
         flex-direction: column;
-        margin-bottom: 20px;
+        margin-bottom: 10px;
 
         & input{
             padding: 5px 10px;
+            width: 200px;
             font-family: monospace;
             transition: background-color 0.5s;
             cursor: pointer;
@@ -41,6 +42,24 @@ h1{
             &:hover{
                 background-color: lightgray;
             }
+        }
+    }
+
+    & button{
+        width: 130px;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 7px 14px;
+        font-weight: bold;
+        font-size: 1.3vw;
+        text-align: center;
+        cursor: pointer;
+        background-color: gray;
+        transition: background-color 0.5s;
+
+        &:hover{
+            background-color: lightgray;
         }
     }
 }
@@ -62,9 +81,8 @@ main{
             display: flex;
         }
 
-        & .lose_message{
+        & .end_message{
             text-align: center;
-            border: 2px solid rgb(209, 2, 2);
             position: absolute;
             margin-top: 30px;
             font-size: 5vw;
@@ -72,26 +90,20 @@ main{
             padding: 10px 15px;
             border-radius: 20px;
             font-weight: bold;
-            color: rgb(209, 2, 2);
             z-index: 10;
+        }
+
+        & .lose_message{
+            border: 2px solid rgb(209, 2, 2);
+            color: rgb(209, 2, 2);
         }
 
         & .win_message{
-            text-align: center;
             border: 2px solid green;
-            position: absolute;
-            margin-top: 30px;
-            font-size: 5vw;
-            background-color: white;
-            padding: 10px 15px;
-            border-radius: 20px;
-            font-weight: bold;
             color: green;
-            z-index: 10;
         }
 
         .grid_tile{
-            background-color: white;
             margin: 0;
             padding: 0;
             border: 1px solid lightgray;
@@ -101,7 +113,6 @@ main{
             z-index: 2;
             position: absolute;
             background-color: green;
-            border: 1px solid white;
         }
 
         .fruit{

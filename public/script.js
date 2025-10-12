@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.addEventListener("keydown", event => direction_control.chooseDirection(event));
     const start_game = new GameSetup();
     document.getElementById("start_btn").onclick = () => start_game.setGame();
+    document.getElementById("defaultValues").onclick = () => start_game.defaultValues();
 });
 
 // To do:
@@ -59,6 +60,12 @@ class GameSetup{
 
     start_button = document.getElementById("start_btn");
     input_control = document.getElementById("input-window");
+
+    defaultValues(){
+        document.getElementById("tick_speed").value = 150;
+        document.getElementById("tile_number_x").value = 12;
+        document.getElementById("tile_number_y").value = 12;
+    }
 
     setGame(){
         const {game_tick, tile_size, tile_x_amount, tile_y_amount} = this.setGameRules();
@@ -190,6 +197,7 @@ class Game extends GameSetup{
             this.removeFruit(grid);
 
             const lose_message = document.createElement("p");
+            lose_message.classList.add("end_message");
             lose_message.classList.add("lose_message");
             lose_message.textContent = "YOU LOSE!";
             game_board.appendChild(lose_message);
@@ -217,6 +225,7 @@ class Game extends GameSetup{
         new Audio(this.GameAudio.player_victory).play();
 
         const win_message = document.createElement("p");
+        win_message.classList.add("end_message");
         win_message.classList.add("win_message");
         win_message.textContent = "YOU WIN!";
         game_board.appendChild(win_message);
