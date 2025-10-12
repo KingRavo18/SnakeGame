@@ -122,8 +122,8 @@ class GameSetup{
         }
 
         document.getElementById("game_screen").appendChild(game_board);
-        Player.positionX = 6;
-        Player.positionY = 6;
+        Player.positionX = tile_x_amount / 2;
+        Player.positionY = tile_y_amount / 2;
         grid[Player.positionY][Player.positionX].appendChild(avatar);
         return {grid, game_board};
     }
