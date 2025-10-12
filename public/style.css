@@ -24,11 +24,24 @@ h1{
     position: absolute;
     left: 10px;
     top: 100px;
-    gap: 20px;
 
     & label{
         display: flex;
         flex-direction: column;
+        margin-bottom: 20px;
+
+        & input{
+            padding: 5px 10px;
+            font-family: monospace;
+            transition: background-color 0.5s;
+            cursor: pointer;
+            border-radius: 2px;
+            border: 1px solid rgb(146, 146, 146);
+
+            &:hover{
+                background-color: lightgray;
+            }
+        }
     }
 }
 main{
