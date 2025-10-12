@@ -25,10 +25,16 @@ main{
 
     & .game_board{
         display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
+        width: auto;
+        height: auto;
+        flex-direction: column;
+        align-items: center;
         padding: 0;
         border: 2px solid black;
+
+        & .game_board_row{
+            display: flex;
+        }
 
         & .lose_message{
             text-align: center;

@@ -8,7 +8,6 @@ document.addEventListener("DOMContentLoaded", () => {
 // To do:
 // Make a tail for the avatar
 // Give collision to the tail
-// Figure out what is going on with the +18 pixel thing
 
 //These cannot be incorporated into any classes. If I try, nothing works
 const Player = {
@@ -42,6 +41,7 @@ class DirectionControl{
                 break;
         }
     }
+
     forbidDirection(oppositeDirection, selectedDirection){
         if(Player.move_direction === oppositeDirection) return;
         Player.move_direction = selectedDirection;
@@ -58,14 +58,13 @@ class GameSetup{
     };
     GameRules = {
         game_tick: 150,
-        tile_size: 40,
-        tile_x_amount: 12,
-        tile_y_amount: 12,
+        tile_size: 35,
+        tile_x_amount: 14,
+        tile_y_amount: 14,
     };
 
     start_button = document.getElementById("start_btn");
     pointsForVictory = this.GameRules.tile_x_amount * this.GameRules.tile_y_amount - 1;
-    fruit_picked_up = 0;
 
     setGame(){
         const avatar = this.setAvatar();
@@ -94,24 +93,25 @@ class GameSetup{
         const grid = [];
         const game_board = document.createElement("div");
         game_board.classList.add("game_board");
-        game_board.style.width = `${this.GameRules.tile_size * this.GameRules.tile_x_amount + 18}px`;
-        game_board.style.height = `${this.GameRules.tile_size * this.GameRules.tile_y_amount + 18}px`;
 
         // Loop to create the game 2D grid array
         for(let i = 0; i < this.GameRules.tile_y_amount; i++){
             const x_array = [];
+            const game_board_row = document.createElement("div");
+            game_board_row.classList.add("game_board_row");
             for(let j = 0; j < this.GameRules.tile_x_amount; j++){
                 const grid_tile = document.createElement("div");
                 grid_tile.classList.add("grid_tile");
                 grid_tile.style.width = `${this.GameRules.tile_size}px`;
                 grid_tile.style.height = `${this.GameRules.tile_size}px`;
-                game_board.appendChild(grid_tile);
                 x_array.push(grid_tile);
-            }  
+                game_board_row.appendChild(grid_tile);
+            } 
             grid.push(x_array);
+            game_board.appendChild(game_board_row);
         }
-        document.getElementById("game_screen").appendChild(game_board);
 
+        document.getElementById("game_screen").appendChild(game_board);
         Player.positionX = 6;
         Player.positionY = 6;
         grid[Player.positionY][Player.positionX].appendChild(avatar);
