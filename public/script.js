@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.addEventListener("keydown", event => direction_control.chooseDirection(event));
     const start_game = new GameSetup();
     document.getElementById("start_btn").onclick = () => start_game.setGame();
-    document.getElementById("defaultValues").onclick = () => start_game.defaultValues();
+    document.getElementById("defaultValues").onclick = () => start_game.selectDefaultValues();
 });
 
 // To do:
@@ -61,10 +61,12 @@ class GameSetup{
     start_button = document.getElementById("start_btn");
     input_control = document.getElementById("input-window");
 
-    defaultValues(){
+    selectDefaultValues(){
+        new Audio(this.GameAudio.btn_click).play();
         document.getElementById("tick_speed").value = 150;
         document.getElementById("tile_number_x").value = 12;
         document.getElementById("tile_number_y").value = 12;
+        document.getElementById("tile_size").value = 35;
     }
 
     setGame(){
